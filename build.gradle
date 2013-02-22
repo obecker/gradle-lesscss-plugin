@@ -1,0 +1,33 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+apply plugin: 'idea'
+apply plugin: 'rhino'
+
+
+version = '1.3.3-SNAPSHOT'
+group = 'de.obqo.gradle'
+ext.archivesBaseName = 'gradle-lesscss-plugin'
+ext.isSnapshot = version.endsWith("-SNAPSHOT")
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    groovy localGroovy()
+    compile gradleApi()
+    testCompile ('org.spockframework:spock-core:0.6-groovy-1.8') {
+        exclude module: "junit-dep"
+        exclude module: "groovy-all"
+    }
+}
+
+idea.module {
+    ext.gradleCacheVariable = 'GRADLE_CACHE'
+    downloadJavadoc = true
+    ext.downloadSource = true
+    outputDir = file("intellij/out")
+    testOutputDir = file("intellij/testOut")
+}
+
