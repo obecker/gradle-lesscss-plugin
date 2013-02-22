@@ -15,13 +15,11 @@
  */
 
 package de.obqo.gradle.lesscss
-
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-
 /**
  * @author Oliver Becker
  * @since 17.02.13
@@ -38,37 +36,54 @@ class LessTaskTest extends Specification {
         project.apply(plugin: LessPlugin)
         task = project.tasks.lesscss
         lesscss = project.lesscss
-        lesscss.dest = dir.newFile()
+        lesscss.dest = dir.newFolder()
     }
 
-    def getFile(String name) {
+    def getProvided(String name) {
         new File(Thread.currentThread().contextClassLoader.getResource(name).toURI())
+    }
+
+    def getGenerated(String name) {
+        new File(lesscss.dest, name)
     }
 
     def 'simple run of less'() {
         given:
-        lesscss.source = getFile("style.less")
+        lesscss.source = [getProvided("style.less")]
 
         when:
         task.run()
 
         then:
-        def actual = task.dest.readLines()
-        def expected = getFile("style.css").readLines()
+        def actual = getGenerated('style.css').readLines()
+        def expected = getProvided("style.css").readLines()
         actual == expected
     }
 
     def 'run less with compress option'() {
         given:
-        lesscss.source = getFile("style.less")
+        lesscss.source = [getProvided("style.less")]
         lesscss.compress = true
 
         when:
         task.run()
 
         then:
-        def actual = task.dest.readLines()
-        def expected = getFile("style.min.css").readLines()
+        def actual = getGenerated('style.css').readLines()
+        def expected = getProvided("style.min.css").readLines()
+        actual == expected
+    }
+
+    def 'run less for multiple files'() {
+        given:
+        lesscss.source = [getProvided("style.less"), getProvided("module.less")]
+
+        when:
+        task.run()
+
+        then:
+        def actual = [getGenerated('style.css').readLines(), getGenerated('module.css').readLines()]
+        def expected = [getProvided("style.css").readLines(), getProvided("module.css").readLines()]
         actual == expected
     }
 

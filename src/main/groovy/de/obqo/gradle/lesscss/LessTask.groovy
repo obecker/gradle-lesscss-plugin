@@ -19,11 +19,12 @@ package de.obqo.gradle.lesscss
 import de.obqo.gradle.helper.ResourceUtil
 import de.obqo.gradle.helper.RhinoExec
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.FileCollection
-import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * @author Oliver Becker
@@ -31,39 +32,46 @@ import org.gradle.api.tasks.TaskAction
  */
 class LessTask extends DefaultTask {
 
+    private static final Logger logger = LoggerFactory.getLogger(LessTask.class)
+
     private static final String LESS_PATH = 'less-rhino-1.3.3.js'
     private static final String TMP_DIR = "tmp${File.separator}js"
 
-    private final RhinoExec rhino = new RhinoExec(project)
-
+    /**
+     * The property <code>sourceFiles</code> enables the incremental build. Its value is the base directory of the source files tree
+     * (see {@link LessExtension#source}), that means all contained files will be accounted for the incremental build.
+     * However, this property is not used explicitly by this task.
+     */
     @InputFiles
-    def sourceDir
-    @InputFile
-    def source
-    @OutputFile
-    def dest
-
-    FileCollection getSourceDir() {
-        project.lesscss.sourceDir
+    @SkipWhenEmpty
+    File getSourceFiles() {
+        project.lesscss.source.dir
     }
 
-    File getDest() {
+    /**
+     * The property <code>destDir</code> represents the directory object defined in {@link LessExtension#dest}
+     */
+    @OutputDirectory
+    File getDestDir() {
         project.file(project.lesscss.dest)
     }
 
-    File getSource() {
-        project.file(project.lesscss.source)
-    }
 
     @TaskAction
     def run() {
         final File lessFile = ResourceUtil.extractFileToDirectory(new File(project.buildDir, TMP_DIR), LESS_PATH)
-        final List<String> args = [lessFile.canonicalPath, getSource().canonicalPath]
+        final RhinoExec rhino = new RhinoExec(project)
 
-        if (project.lesscss.compress) {
-            args.add('-x')
+        File destDir = getDestDir()
+        project.lesscss.source.each { lessSource ->
+            final List<String> args = [lessFile.canonicalPath, lessSource.canonicalPath]
+            if (project.lesscss.compress) {
+                args.add('-x')
+            }
+            File destFile = new File(destDir, lessSource.name.replace('.less', '.css'))
+            logger.info("Compile ${lessSource.absolutePath} to ${destFile.absolutePath}");
+            rhino.execute(args, [workingDir: project.projectDir.canonicalPath, out: new FileOutputStream(destFile)])
         }
-        rhino.execute(args, [workingDir: project.projectDir.canonicalPath, out: new FileOutputStream(getDest())])
     }
 
 }

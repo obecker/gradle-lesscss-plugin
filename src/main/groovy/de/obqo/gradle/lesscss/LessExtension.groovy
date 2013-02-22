@@ -15,7 +15,6 @@
  */
 
 package de.obqo.gradle.lesscss
-
 /**
  * @author Oliver Becker
  * @since 17.02.13
@@ -24,16 +23,13 @@ class LessExtension {
 
     public static final String NAME = 'lesscss'
 
-    /** A <code>FileCollection</code> containing all source files that <code>source</code> depends on */
-    def sourceDir = null
-
-    /** The name and path of the less file that should be compiled */
+    /** A <code>ConfigurableFileTree</code> representing the set of LESS files that should be compiled */
     def source = null
 
-    /** The name and path of the css file to be generated */
+    /** The target directory for the compiled CSS files */
     def dest = null
 
-    /** If set to <code>true</code> the resulting css will be compressed */
+    /** If set to <code>true</code> the resulting CSS will be compressed */
     def compress = false
 
 }
