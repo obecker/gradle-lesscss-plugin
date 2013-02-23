@@ -18,11 +18,14 @@ package de.obqo.gradle.lesscss
 
 import de.obqo.gradle.helper.ResourceUtil
 import de.obqo.gradle.helper.RhinoExec
+
 import org.gradle.api.DefaultTask
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
+
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -45,6 +48,8 @@ class LessTask extends DefaultTask {
     @InputFiles
     @SkipWhenEmpty
     File getSourceFiles() {
+        if (project.lesscss.source == null)
+            throw new InvalidUserDataException("missing property source for lesscss")
         project.lesscss.source.dir
     }
 
@@ -53,6 +58,8 @@ class LessTask extends DefaultTask {
      */
     @OutputDirectory
     File getDestDir() {
+        if (project.lesscss.dest == null)
+            throw new InvalidUserDataException("missing property dest for lesscss")
         project.file(project.lesscss.dest)
     }
 
