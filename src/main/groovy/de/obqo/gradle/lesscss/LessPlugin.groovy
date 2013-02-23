@@ -19,6 +19,8 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 /**
+ * Plugin class for the gradle-lesscss-plugin. Adds the <code>lesscss</code> task to the current project.
+ *
  * @author Oliver Becker
  * @since 17.02.13
  */

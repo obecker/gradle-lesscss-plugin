@@ -30,6 +30,8 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
+ * Implementation class for the <code>lesscss</code> task.
+ *
  * @author Oliver Becker
  * @since 17.02.13
  */
@@ -48,8 +50,9 @@ class LessTask extends DefaultTask {
     @InputFiles
     @SkipWhenEmpty
     File getSourceFiles() {
-        if (project.lesscss.source == null)
+        if (project.lesscss.source == null) {
             throw new InvalidUserDataException("missing property source for lesscss")
+        }
         project.lesscss.source.dir
     }
 
@@ -58,8 +61,9 @@ class LessTask extends DefaultTask {
      */
     @OutputDirectory
     File getDestDir() {
-        if (project.lesscss.dest == null)
+        if (project.lesscss.dest == null) {
             throw new InvalidUserDataException("missing property dest for lesscss")
+        }
         project.file(project.lesscss.dest)
     }
 

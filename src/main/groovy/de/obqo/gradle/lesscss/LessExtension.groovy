@@ -15,7 +15,10 @@
  */
 
 package de.obqo.gradle.lesscss
+
 /**
+ * Extension class for specifying properties of the lesscss plugin in a <code>build.gradle</code> file.
+ *
  * @author Oliver Becker
  * @since 17.02.13
  */
