@@ -1,5 +1,4 @@
-Gradle LessCss Plugin
-=====================
+# Gradle LessCss Plugin [![Build Status](https://travis-ci.org/obecker/gradle-lesscss-plugin.png?branch=master)](https://travis-ci.org/obecker/gradle-lesscss-plugin)
 
 A gradle plugin that compiles [LESS](http://lesscss.org) files to CSS. Version 1.0-1.3.3 uses LESS version 1.3.3.
 
@@ -8,8 +7,7 @@ on the build server or adding the compiled CSS files to your version control sys
 
 
 
-Usage
------
+## Usage
 
 #### Add the plugin
 
@@ -68,8 +66,7 @@ Then everytime the `war` task is executed the `lesscss` task will be executed be
 
 **That's it!**
 
-Options
--------
+## Options
 
 The `lesscss` object provides 3 properties for configuring the gradle-lesscss-plugin:
 
@@ -87,8 +84,7 @@ source files, thus compiling `style.less` results in `style.css` in the `dest` d
 * `compress` (optional, defaults to `false`)  
 when set to `true` turns on compression of the created CSS files.
 
-Acknowledgments
----------------
+## Acknowledgments
 
 Main parts of the build configuration as well as two classes for running JS scripts with Rhino have been taken from Eric Wendelin's great
 [gradle-js-plugin](https://github.com/eriwen/gradle-js-plugin). Without his work the development of this plugin would have taken much longer (or would
