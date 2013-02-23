@@ -1,10 +1,10 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
+apply plugin: 'signing'
 apply plugin: 'idea'
-apply plugin: 'rhino'
 
 
-version = '1.3.3-SNAPSHOT'
+version = '1.0-1.3.3'
 group = 'de.obqo.gradle'
 ext.archivesBaseName = 'gradle-lesscss-plugin'
 ext.isSnapshot = version.endsWith("-SNAPSHOT")
@@ -29,5 +29,85 @@ idea.module {
     ext.downloadSource = true
     outputDir = file("intellij/out")
     testOutputDir = file("intellij/testOut")
+}
+
+task sourceJar(type: Jar) {
+    description = 'An archive of the source code for Maven Central'
+    classifier = 'sources'
+    from sourceSets.main.groovy
+}
+
+task groovydocJar(type: Jar) {
+    description = 'An archive of the GroovyDocs for Maven Central'
+    classifier = 'javadoc'
+    from groovydoc
+}
+
+artifacts {
+    archives groovydocJar, sourceJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+// Only *require* signing if we are uploading a non snapshot version
+gradle.taskGraph.whenReady { taskGraph ->
+    tasks.withType(org.gradle.plugins.signing.Sign).all {
+        required = taskGraph.hasTask(":uploadArchives") && !isSnapshot
+    }
+}
+
+install.repositories.mavenInstaller {
+    pom.project(pomConfiguration)
+    if (signing.signatory) {
+        beforeDeployment { signing.signPom(it) }
+    }
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        if (signing.signatory) {
+            beforeDeployment { signPom(it) }
+        }
+        name = 'mavenCentralReleaseDeployer'
+        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+            authentication(userName: System.properties['mavenCentralUsername'], password: System.properties['mavenCentralPassword'])
+            releases(updatePolicy: 'always')
+            snapshots(updatePolicy: 'always')
+        }
+        pom.project(pomConfiguration)
+    }
+}
+
+/**
+ * Create POM config and return for use by other tasks.
+ */
+def getPomConfiguration() {
+    return {
+        name 'Gradle LessCss Plugin'
+        packaging 'jar'
+        description 'A Gradle plugin for compiling LESS files to CSS files.'
+        url 'https://github.com/obecker/gradle-lesscss-plugin'
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        developers {
+            developer {
+                id 'obecker'
+                name 'Oliver Becker'
+                email 'ob@obqo.de'
+            }
+        }
+        scm {
+            connection 'scm:https://obecker@github.com/obecker/gradle-lesscss-plugin'
+            developerConnection 'scm:git@github.com:obecker/gradle-lesscss-plugin.git'
+            url 'https://github.com/obecker/gradle-lesscss-plugin'
+        }
+    }
 }
 
