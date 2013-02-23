@@ -9,6 +9,8 @@ group = 'de.obqo.gradle'
 ext.archivesBaseName = 'gradle-lesscss-plugin'
 ext.isSnapshot = version.endsWith("-SNAPSHOT")
 
+def authUsername = hasProperty('sonatypeUsername') ? sonatypeUsername : ''
+def authPassword = hasProperty('sonatypePassword') ? sonatypePassword : ''
 
 repositories {
     mavenCentral()
@@ -72,7 +74,7 @@ uploadArchives {
         }
         name = 'mavenCentralReleaseDeployer'
         repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
-            authentication(userName: sonatypeUsername, password: sonatypeUsername)
+            authentication(userName: authUsername, password: authPassword)
             releases(updatePolicy: 'always')
             snapshots(updatePolicy: 'always')
         }
