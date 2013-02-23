@@ -1,4 +1,4 @@
-gradle-lesscss-plugin
+Gradle LessCss Plugin
 =====================
 
 A gradle plugin that compiles [LESS](http://lesscss.org) files to CSS. Version 1.0-1.3.3 uses LESS version 1.3.3.
