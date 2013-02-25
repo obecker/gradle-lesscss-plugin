@@ -1,6 +1,6 @@
 # Gradle LessCss Plugin [![Build Status](https://travis-ci.org/obecker/gradle-lesscss-plugin.png?branch=master)](https://travis-ci.org/obecker/gradle-lesscss-plugin)
 
-A gradle plugin that compiles [LESS](http://lesscss.org) files to CSS. Version 1.0-1.3.3 uses LESS version 1.3.3.
+A gradle plugin that compiles [LESS](http://lesscss.org) files to CSS. Version 1.0-1.3.3 of the plugin uses LESS version 1.3.3.
 
 This plugin helps to you to integrate the processing of LESS files into your automated build process without the need of installing node.js
 on the build server or adding the compiled CSS files to your version control system.
@@ -24,8 +24,8 @@ buildscript {
 }
 ```
 
-**Important notice**: the deployment of the artifact to maven central is currently pending. 
-Meanwhile you may build the plugin yourself (`gradle install`) and then add `mavenLocal()`
+**Important notice**: the deployment of the artifact to maven central is currently [pending](https://issues.sonatype.org/browse/OSSRH-5490). 
+Meanwhile you may build the plugin yourself by running `gradle install` and then add `mavenLocal()`
 to the `buildscript` `repositories` section of the project where you want to use the plugin.
 
 #### Activate the plugin
