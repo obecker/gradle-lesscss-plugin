@@ -43,13 +43,14 @@ class LessTask extends DefaultTask {
     private static final String TMP_DIR = "tmp${File.separator}js"
 
     /**
-     * The property <code>sourceFiles</code> enables the incremental build. Its value is the base directory of the source files tree
+     * The property <code>sourceDir</code> enables the incremental build. Its value is the base directory of the source files tree
      * (see {@link LessExtension#source}), that means all contained files will be accounted for the incremental build.
-     * However, this property is not used explicitly by this task.
+     * Moreover, it will be used to determine the destination subdirectory (in case the compiled LESS files are in subdirectories under
+     * the base directory).
      */
     @InputFiles
     @SkipWhenEmpty
-    File getSourceFiles() {
+    File getSourceDir() {
         if (project.lesscss.source == null) {
             throw new InvalidUserDataException("missing property source for lesscss")
         }
@@ -73,14 +74,19 @@ class LessTask extends DefaultTask {
         final File lessFile = ResourceUtil.extractFileToDirectory(new File(project.buildDir, TMP_DIR), LESS_PATH)
         final RhinoExec rhino = new RhinoExec(project)
 
+        String sourceDirPath = getSourceDir().canonicalPath
         File destDir = getDestDir()
         project.lesscss.source.each { lessSource ->
-            final List<String> args = [lessFile.canonicalPath, lessSource.canonicalPath]
+            def sourcePath = lessSource.canonicalPath
+            final List<String> args = [lessFile.canonicalPath, sourcePath]
             if (project.lesscss.compress) {
                 args.add('-x')
             }
-            File destFile = new File(destDir, lessSource.name.replace('.less', '.css'))
-            logger.info("Compile ${lessSource.absolutePath} to ${destFile.absolutePath}");
+
+            String relativePath = sourcePath.startsWith(sourceDirPath) ? sourcePath.substring(sourceDirPath.length()) : lessSource.name
+            File destFile = new File(destDir, relativePath.replace('.less', '.css'))
+            destFile.parentFile.mkdirs()
+            logger.info("Compile ${sourcePath} to ${destFile.canonicalPath}");
             rhino.execute(args, [workingDir: project.projectDir.canonicalPath, out: new FileOutputStream(destFile)])
         }
     }

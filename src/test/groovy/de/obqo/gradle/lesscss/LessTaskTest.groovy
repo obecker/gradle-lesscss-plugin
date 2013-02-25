@@ -15,6 +15,7 @@
  */
 
 package de.obqo.gradle.lesscss
+
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
@@ -25,6 +26,23 @@ import spock.lang.Specification
  * @since 17.02.13
  */
 class LessTaskTest extends Specification {
+
+    class FileTreeMock implements Iterable<File> {
+
+        def dir
+        def files
+
+        FileTreeMock(File pdir, File... pFiles) {
+            dir = pdir
+            files = pFiles
+        }
+
+        def Iterator<File> iterator() {
+            return files.iterator()
+        }
+
+    }
+
 
     @Rule TemporaryFolder dir = new TemporaryFolder()
 
@@ -49,7 +67,8 @@ class LessTaskTest extends Specification {
 
     def 'simple run of less'() {
         given:
-        lesscss.source = [getProvided("style.less")]
+        File sourceFile = getProvided("style.less")
+        lesscss.source = new FileTreeMock(sourceFile.parentFile, sourceFile)
 
         when:
         task.run()
@@ -62,7 +81,8 @@ class LessTaskTest extends Specification {
 
     def 'run less with compress option'() {
         given:
-        lesscss.source = [getProvided("style.less")]
+        File sourceFile = getProvided("style.less")
+        lesscss.source = new FileTreeMock(sourceFile.parentFile, sourceFile)
         lesscss.compress = true
 
         when:
@@ -76,14 +96,15 @@ class LessTaskTest extends Specification {
 
     def 'run less for multiple files'() {
         given:
-        lesscss.source = [getProvided("style.less"), getProvided("module.less")]
+        File sourceFile = getProvided("style.less")
+        lesscss.source = new FileTreeMock(sourceFile.parentFile, sourceFile, getProvided("module.less"), getProvided("de/sub.less"))
 
         when:
         task.run()
 
         then:
-        def actual = [getGenerated('style.css').readLines(), getGenerated('module.css').readLines()]
-        def expected = [getProvided("style.css").readLines(), getProvided("module.css").readLines()]
+        def actual = [getGenerated('style.css').readLines(), getGenerated('module.css').readLines(), getGenerated('de/sub.css').readLines()]
+        def expected = [getProvided("style.css").readLines(), getProvided("module.css").readLines(), getProvided("de/sub.css").readLines()]
         actual == expected
     }
 
