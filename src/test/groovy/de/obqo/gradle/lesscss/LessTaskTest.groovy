@@ -16,6 +16,7 @@
 
 package de.obqo.gradle.lesscss
 
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.Rule
@@ -31,11 +32,6 @@ class LessTaskTest extends Specification {
 
         def dir
         def files
-
-        FileTreeMock(File pdir, File... pFiles) {
-            dir = pdir
-            files = pFiles
-        }
 
         def Iterator<File> iterator() {
             return files.iterator()
@@ -68,7 +64,7 @@ class LessTaskTest extends Specification {
     def 'simple run of less'() {
         given:
         File sourceFile = getProvided("style.less")
-        lesscss.source = new FileTreeMock(sourceFile.parentFile, sourceFile)
+        lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile])
 
         when:
         task.run()
@@ -82,7 +78,7 @@ class LessTaskTest extends Specification {
     def 'run less with compress option'() {
         given:
         File sourceFile = getProvided("style.less")
-        lesscss.source = new FileTreeMock(sourceFile.parentFile, sourceFile)
+        lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile])
         lesscss.compress = true
 
         when:
@@ -97,7 +93,7 @@ class LessTaskTest extends Specification {
     def 'run less for multiple files'() {
         given:
         File sourceFile = getProvided("style.less")
-        lesscss.source = new FileTreeMock(sourceFile.parentFile, sourceFile, getProvided("module.less"), getProvided("de/sub.less"))
+        lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile, getProvided("module.less"), getProvided("de/sub.less")])
 
         when:
         task.run()
@@ -106,6 +102,28 @@ class LessTaskTest extends Specification {
         def actual = [getGenerated('style.css').readLines(), getGenerated('module.css').readLines(), getGenerated('de/sub.css').readLines()]
         def expected = [getProvided("style.css").readLines(), getProvided("module.css").readLines(), getProvided("de/sub.css").readLines()]
         actual == expected
+    }
+
+    def 'dont run without source'() {
+        when:
+        task.run()
+
+        then:
+        lesscss.dest != null
+        thrown(InvalidUserDataException)
+    }
+
+    def 'dont run without dest'() {
+        given:
+        File sourceFile = getProvided("style.less")
+        lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile])
+        lesscss.dest = null
+
+        when:
+        task.run()
+
+        then:
+        thrown(InvalidUserDataException)
     }
 
 }
