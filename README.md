@@ -24,10 +24,6 @@ buildscript {
 }
 ```
 
-**Important notice**: the deployment of the artifact to maven central is currently [pending](https://issues.sonatype.org/browse/OSSRH-5490). 
-Meanwhile you may build the plugin yourself by running `gradle install` and then add `mavenLocal()`
-to the `buildscript` `repositories` section of the project where you want to use the plugin.
-
 #### Activate the plugin
 
 ```groovy
