@@ -21,6 +21,10 @@ import de.obqo.gradle.helper.RhinoExec
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.InvalidUserDataException
+import org.gradle.api.file.ConfigurableFileTree
+import org.gradle.api.file.FileTree
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SkipWhenEmpty
@@ -42,31 +46,55 @@ class LessTask extends DefaultTask {
     private static final String LESS_PATH = 'less-rhino-1.3.3.js'
     private static final String TMP_DIR = "tmp${File.separator}js"
 
-    /**
-     * The property <code>sourceDir</code> enables the incremental build. Its value is the base directory of the source files tree
-     * (see {@link LessExtension#source}), that means all contained files will be accounted for the incremental build.
-     * Moreover, it will be used to determine the destination subdirectory (in case the compiled LESS files are in subdirectories under
-     * the base directory).
-     */
+    def source
+
     @InputFiles
     @SkipWhenEmpty
-    File getSourceDir() {
-        if (project.lesscss.source == null) {
+    FileTree getSourceFiles() {
+        if (source == null || source.empty) {
             throw new InvalidUserDataException("missing property source for lesscss")
         }
-        project.lesscss.source.dir
+        if (source instanceof ConfigurableFileTree) {
+            source
+        } else {
+            project.files(source).asFileTree
+        }
     }
 
     /**
-     * The property <code>destDir</code> represents the directory object defined in {@link LessExtension#dest}
+     * The property <code>sourceDir</code> enables the incremental build. Its value is either the parent directly of a single source file or the base directory
+     * of a source files tree. All contained files will be accounted for the incremental build.
+     * Moreover, the <code>sourceDir</code> will be used to determine the destination subdirectory (in case the compiled LESS files are in subdirectories under
+     * the base directory).
      */
+    @InputDirectory
+    @SkipWhenEmpty
+    File getSourceDir() {
+        FileTree tree = getSourceFiles()
+        if (source.metaClass.hasProperty(source, "dir")) { // use source instead of tree for the tests
+            source.dir
+        } else if (tree.files.size() == 1) {
+            tree.singleFile.parentFile
+        } else {
+            throw new InvalidUserDataException("use fileTree() for compiling multiple less files")
+        }
+    }
+
+    /** The target directory for the compiled CSS files */
+    @Input
+    def dest
+
     @OutputDirectory
     File getDestDir() {
-        if (project.lesscss.dest == null) {
+        if (dest == null) {
             throw new InvalidUserDataException("missing property dest for lesscss")
         }
-        project.file(project.lesscss.dest)
+        project.file(dest)
     }
+
+    /** If set to <code>true</code> the resulting CSS will be compressed */
+    @Input
+    boolean compress = false
 
 
     @TaskAction
@@ -75,11 +103,12 @@ class LessTask extends DefaultTask {
         final RhinoExec rhino = new RhinoExec(project)
 
         String sourceDirPath = getSourceDir().canonicalPath
+        logger.info("Base less directory is " + sourceDirPath)
         File destDir = getDestDir()
-        project.lesscss.source.each { lessSource ->
+        getSourceFiles().each { lessSource ->
             def sourcePath = lessSource.canonicalPath
             final List<String> args = [lessFile.canonicalPath, sourcePath]
-            if (project.lesscss.compress) {
+            if (compress) {
                 args.add('-x')
             }
 

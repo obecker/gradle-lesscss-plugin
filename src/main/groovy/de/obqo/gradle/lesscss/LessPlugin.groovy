@@ -27,8 +27,6 @@ import org.gradle.api.Project
 class LessPlugin implements Plugin<Project> {
 
     void apply(final Project project) {
-        project.extensions.create(LessExtension.NAME, LessExtension)
-
         configureDependencies(project)
 
         project.task('lesscss', type: LessTask, group: 'Build', description: 'Compile LESS files into CSS files')

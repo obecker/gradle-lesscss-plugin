@@ -34,7 +34,11 @@ class LessTaskTest extends Specification {
         def files
 
         def Iterator<File> iterator() {
-            return files.iterator()
+            files.iterator()
+        }
+
+        def boolean isEmpty() {
+            files.empty
         }
 
     }
@@ -43,13 +47,11 @@ class LessTaskTest extends Specification {
     @Rule TemporaryFolder dir = new TemporaryFolder()
 
     Project project = ProjectBuilder.builder().build()
-    def task
-    def lesscss
+    LessTask lesscss
 
     def setup() {
         project.apply(plugin: LessPlugin)
-        task = project.tasks.lesscss
-        lesscss = project.lesscss
+        lesscss = project.tasks.lesscss
         lesscss.dest = dir.newFolder()
     }
 
@@ -58,7 +60,19 @@ class LessTaskTest extends Specification {
     }
 
     def getGenerated(String name) {
-        new File(lesscss.dest, name)
+        new File(lesscss.destDir, name)
+    }
+
+    def 'set source as a string'() {
+        given:
+        def provided = getProvided("style.less")
+
+        when:
+        lesscss.source = provided.absolutePath
+
+        then:
+        lesscss.getSourceFiles().files.size() == 1
+        lesscss.getSourceFiles().singleFile == provided
     }
 
     def 'simple run of less'() {
@@ -67,7 +81,7 @@ class LessTaskTest extends Specification {
         lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile])
 
         when:
-        task.run()
+        lesscss.run()
 
         then:
         def actual = getGenerated('style.css').readLines()
@@ -82,7 +96,7 @@ class LessTaskTest extends Specification {
         lesscss.compress = true
 
         when:
-        task.run()
+        lesscss.run()
 
         then:
         def actual = getGenerated('style.css').readLines()
@@ -96,7 +110,7 @@ class LessTaskTest extends Specification {
         lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile, getProvided("module.less"), getProvided("de/sub.less")])
 
         when:
-        task.run()
+        lesscss.run()
 
         then:
         def actual = [getGenerated('style.css').readLines(), getGenerated('module.css').readLines(), getGenerated('de/sub.css').readLines()]
@@ -105,11 +119,14 @@ class LessTaskTest extends Specification {
     }
 
     def 'dont run without source'() {
+        given:
+        lesscss.source = null
+        // lesscss.dest != null, see setup()
+
         when:
-        task.run()
+        lesscss.run()
 
         then:
-        lesscss.dest != null
         thrown(InvalidUserDataException)
     }
 
@@ -120,7 +137,7 @@ class LessTaskTest extends Specification {
         lesscss.dest = null
 
         when:
-        task.run()
+        lesscss.run()
 
         then:
         thrown(InvalidUserDataException)
