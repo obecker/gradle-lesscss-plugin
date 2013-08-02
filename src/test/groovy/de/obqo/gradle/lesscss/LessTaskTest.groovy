@@ -87,6 +87,7 @@ class LessTaskTest extends Specification {
         def actual = getGenerated('style.css').readLines()
         def expected = getProvided("style.css").readLines()
         actual == expected
+        lesscss.getLessPath() == 'less-rhino-1.3.3.js'
     }
 
     def 'run less with compress option'() {
@@ -102,6 +103,38 @@ class LessTaskTest extends Specification {
         def actual = getGenerated('style.css').readLines()
         def expected = getProvided("style.min.css").readLines()
         actual == expected
+    }
+
+    def 'run less with specific compiler version'() {
+        given:
+        File sourceFile = getProvided("style.less")
+        lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile])
+        lesscss.compress = true
+        lesscss.lessVersion = '1.4.0'
+
+        when:
+        lesscss.run()
+
+        then:
+        def actual = getGenerated('style.css').readLines()
+        def expected = getProvided("style.min.css").readLines()
+        actual == expected
+        lesscss.getLessPath() == 'less-rhino-1.4.0.js'
+    }
+
+
+    def 'dont run with invalid compiler version'() {
+        given:
+        File sourceFile = getProvided("style.less")
+        lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile])
+        lesscss.compress = true
+        lesscss.lessVersion = '1.4.1'
+
+        when:
+        lesscss.run()
+
+        then:
+        thrown(InvalidUserDataException)
     }
 
     def 'run less for multiple files'() {
@@ -141,6 +174,54 @@ class LessTaskTest extends Specification {
 
         then:
         thrown(InvalidUserDataException)
+    }
+
+    def 'correct file path for LESS 1.1.3'() {
+        given:
+        lesscss.lessVersion = '1.1.3'
+
+        expect:
+        lesscss.getLessPath() == 'less-rhino-1.1.3.js'
+    }
+
+    def 'correct file path for LESS 1.1.5'() {
+        given:
+        lesscss.lessVersion = '1.1.5'
+
+        expect:
+        lesscss.getLessPath() == 'less-rhino-1.1.5.js'
+    }
+
+    def 'correct file path for LESS 1.3.1'() {
+        given:
+        lesscss.lessVersion = '1.3.1'
+
+        expect:
+        lesscss.getLessPath() == 'less-rhino-1.3.1.js'
+    }
+
+    def 'correct file path for LESS 1.3.2'() {
+        given:
+        lesscss.lessVersion = '1.3.2'
+
+        expect:
+        lesscss.getLessPath() == 'less-rhino-1.3.2.js'
+    }
+
+    def 'correct file path for LESS 1.3.3'() {
+        given:
+        lesscss.lessVersion = '1.3.3'
+
+        expect:
+        lesscss.getLessPath() == 'less-rhino-1.3.3.js'
+    }
+
+    def 'correct file path for LESS 1.4.0'() {
+        given:
+        lesscss.lessVersion = '1.4.0'
+
+        expect:
+        lesscss.getLessPath() == 'less-rhino-1.4.0.js'
     }
 
 }

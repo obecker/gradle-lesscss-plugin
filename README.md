@@ -80,6 +80,9 @@ source files, thus compiling `style.less` results in `style.css` in the `dest` d
 * `compress` (optional, defaults to `false`)  
 when set to `true` turns on compression of the created CSS files.
 
+* `lessVersion` (optional, defaults to `1.3.3`)
+set the LESS version for compiler. supported versions are '1.1.3', '1.1.5', '1.3.1', '1.3.2','1.3.3', '1.4.0'.
+
 ## Acknowledgments
 
 Main parts of the build configuration as well as two classes for running JS scripts with Rhino have been taken from Eric Wendelin's great
