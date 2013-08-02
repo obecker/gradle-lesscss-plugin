@@ -39,6 +39,7 @@ lesscss {
     }
     dest = 'src/main/webapp/assets/css'
     compress = true
+    lessVersion = '1.3.3'
 }
 ```
 
