@@ -39,6 +39,7 @@ lesscss {
     }
     dest = 'src/main/webapp/assets/css'
     compress = true
+    lessVersion = '1.3.3'
 }
 ```
 
@@ -79,6 +80,9 @@ source files, thus compiling `style.less` results in `style.css` in the `dest` d
 
 * `compress` (optional, defaults to `false`)  
 when set to `true` turns on compression of the created CSS files.
+
+* `lessVersion` (optional, defaults to `1.3.3`)
+set the LESS version for compiler. supported versions are `1.1.3`, `1.1.5`, `1.3.1`, `1.3.2`,`1.3.3`, `1.4.0`.
 
 ## Acknowledgments
 
