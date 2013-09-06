@@ -43,7 +43,10 @@ class LessTask extends DefaultTask {
 
     private static final Logger logger = LoggerFactory.getLogger(LessTask.class)
 
-    private static final String LESS_PATH = 'less-rhino-1.3.3.js'
+    private static final String LESS_PATH_PREFIX = 'less-rhino-'
+    private static final String LESS_PATH_SUFFIX = '.js'
+    private static final List<String> LESS_VERSIONS = ['1.1.3', '1.1.5', '1.3.1', '1.3.2','1.3.3', '1.4.0']
+    private static final String LESS_DEFAULT_VERSION = LESS_VERSIONS[4]
     private static final String TMP_DIR = "tmp${File.separator}js"
 
     def source
@@ -96,10 +99,25 @@ class LessTask extends DefaultTask {
     @Input
     boolean compress = false
 
+    /** Set the version of the less compiler, supported versions <code>1.1.3, 1.1.5, 1.3.1, 1.3.2 ,1.3.3, 1.4.0</code> */
+    @Input
+    String lessVersion = LESS_DEFAULT_VERSION
+
+    String getLessPath() {
+        if( ! (lessVersion in LESS_VERSIONS)){
+            throw new InvalidUserDataException("Unsupported less compiler version for property lessVersion. Supported versions $LESS_VERSIONS")
+        }
+        //build the filepath for the less js file
+        StringBuilder lessPathBuilder = new StringBuilder()
+        lessPathBuilder << LESS_PATH_PREFIX
+        lessPathBuilder << lessVersion
+        lessPathBuilder << LESS_PATH_SUFFIX
+        lessPathBuilder.toString()
+    }
 
     @TaskAction
     def run() {
-        final File lessFile = ResourceUtil.extractFileToDirectory(new File(project.buildDir, TMP_DIR), LESS_PATH)
+        final File lessFile = ResourceUtil.extractFileToDirectory(new File(project.buildDir, TMP_DIR), getLessPath())
         final RhinoExec rhino = new RhinoExec(project)
 
         String sourceDirPath = getSourceDir().canonicalPath
