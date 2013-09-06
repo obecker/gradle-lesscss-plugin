@@ -1,10 +1,14 @@
 # Gradle LessCss Plugin [![Build Status](https://travis-ci.org/obecker/gradle-lesscss-plugin.png?branch=master)](https://travis-ci.org/obecker/gradle-lesscss-plugin)
 
-A gradle plugin that compiles [LESS](http://lesscss.org) files to CSS. Version 1.0-1.3.3 of the plugin uses LESS version 1.3.3.
+A gradle plugin that compiles [LESS](http://lesscss.org) files to CSS.
 
 This plugin helps to you to integrate the processing of LESS files into your automated build process without the need of installing node.js
 on the build server or adding the compiled CSS files to your version control system.
 
+## Versions
+
+* Version 1.0-1.3.3 of the plugin uses LESS version 1.3.3.
+* Version 1.1-1.3.3 of the plugin _(not released yet)_ enables you to choose from LESS versions 1.1.3, 1.1.5, 1.3.1, 1.3.2, 1.3.3.
 
 
 ## Usage
@@ -82,7 +86,7 @@ source files, thus compiling `style.less` results in `style.css` in the `dest` d
 when set to `true` turns on compression of the created CSS files.
 
 * `lessVersion` (optional, defaults to `1.3.3`)
-set the LESS version for compiler. supported versions are `1.1.3`, `1.1.5`, `1.3.1`, `1.3.2`,`1.3.3`, `1.4.0`.
+set the LESS version for compiler. supported versions are `1.1.3`, `1.1.5`, `1.3.1`, `1.3.2`, `1.3.3`.
 
 ## Acknowledgments
 
@@ -90,3 +94,4 @@ Main parts of the build configuration as well as two classes for running JS scri
 [gradle-js-plugin](https://github.com/eriwen/gradle-js-plugin). Without his work the development of this plugin would have taken much longer (or would
 have possibly not even succeeded). Thanks Eric!
 
+Support for `lessVersion` has been added by Alex Ley.

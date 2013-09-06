@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory
  * Implementation class for the <code>lesscss</code> task.
  *
  * @author Oliver Becker
+ * @author Alex Ley
  * @since 17.02.13
  */
 class LessTask extends DefaultTask {
@@ -45,7 +46,7 @@ class LessTask extends DefaultTask {
 
     private static final String LESS_PATH_PREFIX = 'less-rhino-'
     private static final String LESS_PATH_SUFFIX = '.js'
-    private static final List<String> LESS_VERSIONS = ['1.1.3', '1.1.5', '1.3.1', '1.3.2','1.3.3', '1.4.0']
+    private static final List<String> LESS_VERSIONS = ['1.1.3', '1.1.5', '1.3.1', '1.3.2', '1.3.3']
     private static final String LESS_DEFAULT_VERSION = LESS_VERSIONS[4]
     private static final String TMP_DIR = "tmp${File.separator}js"
 
@@ -99,12 +100,12 @@ class LessTask extends DefaultTask {
     @Input
     boolean compress = false
 
-    /** Set the version of the less compiler, supported versions <code>1.1.3, 1.1.5, 1.3.1, 1.3.2 ,1.3.3, 1.4.0</code> */
+    /** Set the version of the less compiler, supported versions <code>1.1.3, 1.1.5, 1.3.1, 1.3.2, 1.3.3</code> */
     @Input
     String lessVersion = LESS_DEFAULT_VERSION
 
     String getLessPath() {
-        if( ! (lessVersion in LESS_VERSIONS)){
+        if (!(lessVersion in LESS_VERSIONS)) {
             throw new InvalidUserDataException("Unsupported less compiler version for property lessVersion. Supported versions $LESS_VERSIONS")
         }
         //build the filepath for the less js file

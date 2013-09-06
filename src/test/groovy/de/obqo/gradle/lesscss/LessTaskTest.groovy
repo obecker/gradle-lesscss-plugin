@@ -24,6 +24,7 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 /**
  * @author Oliver Becker
+ * @author Alex Ley
  * @since 17.02.13
  */
 class LessTaskTest extends Specification {
@@ -110,7 +111,7 @@ class LessTaskTest extends Specification {
         File sourceFile = getProvided("style.less")
         lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile])
         lesscss.compress = true
-        lesscss.lessVersion = '1.4.0'
+        lesscss.lessVersion = '1.3.1'
 
         when:
         lesscss.run()
@@ -119,7 +120,7 @@ class LessTaskTest extends Specification {
         def actual = getGenerated('style.css').readLines()
         def expected = getProvided("style.min.css").readLines()
         actual == expected
-        lesscss.getLessPath() == 'less-rhino-1.4.0.js'
+        lesscss.getLessPath() == 'less-rhino-1.3.1.js'
     }
 
 
@@ -128,7 +129,7 @@ class LessTaskTest extends Specification {
         File sourceFile = getProvided("style.less")
         lesscss.source = new FileTreeMock(dir: sourceFile.parentFile, files: [sourceFile])
         lesscss.compress = true
-        lesscss.lessVersion = '1.4.1'
+        lesscss.lessVersion = '1.2.5'
 
         when:
         lesscss.run()
@@ -214,14 +215,6 @@ class LessTaskTest extends Specification {
 
         expect:
         lesscss.getLessPath() == 'less-rhino-1.3.3.js'
-    }
-
-    def 'correct file path for LESS 1.4.0'() {
-        given:
-        lesscss.lessVersion = '1.4.0'
-
-        expect:
-        lesscss.getLessPath() == 'less-rhino-1.4.0.js'
     }
 
 }
